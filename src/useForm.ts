@@ -420,7 +420,10 @@ export function useForm<
         if (
           watchFieldsHookRef.current[key].has(name) ||
           !watchFieldsHookRef.current[key].size ||
-          isNameInFieldArray(fieldArrayNamesRef.current, name)
+          isNameInFieldArray(fieldArrayNamesRef.current, name) ||
+          [...watchFieldsHookRef.current[key]].find((data) =>
+            name.startsWith(data),
+          )
         ) {
           if (watchFieldsHookRenderRef.current[key]) {
             watchFieldsHookRenderRef.current[key]();
