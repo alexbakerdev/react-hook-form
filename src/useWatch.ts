@@ -37,6 +37,7 @@ export function useWatch<TWatchFieldValues>({
   const methods = useFormContext();
   const { watchFieldsHookRef, watchFieldsHookRenderRef, watchInternal } =
     control || methods.control;
+
   const [value, setValue] = React.useState<unknown>(
     isUndefined(defaultValue)
       ? isString(name)
@@ -44,16 +45,22 @@ export function useWatch<TWatchFieldValues>({
         : {}
       : defaultValue,
   );
+
+  const nameCache = React.useMemo(
+    () => name,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    Array.isArray(name) ? [...name] : [name],
+  );
+
   const idRef = React.useRef<string>();
   const defaultValueRef = React.useRef(defaultValue);
-  const nameRef = React.useRef(name);
 
   const updateWatchValue = React.useCallback(
     () =>
       setValue(
-        watchInternal(nameRef.current, defaultValueRef.current, idRef.current),
+        watchInternal(nameCache, defaultValueRef.current, idRef.current),
       ),
-    [setValue, watchInternal, defaultValueRef, nameRef, idRef],
+    [setValue, watchInternal, defaultValueRef, nameCache, idRef],
   );
 
   React.useEffect(() => {
@@ -62,14 +69,15 @@ export function useWatch<TWatchFieldValues>({
     const watchFieldsHook = watchFieldsHookRef.current;
     watchFieldsHook[id] = new Set();
     watchFieldsHookRender[id] = updateWatchValue;
-    watchInternal(nameRef.current, defaultValueRef.current, id);
-
+    const initialValue = watchInternal(nameCache, defaultValueRef.current, id);
+    setValue(initialValue);
     return () => {
       delete watchFieldsHook[id];
       delete watchFieldsHookRender[id];
     };
   }, [
-    nameRef,
+    setValue,
+    nameCache,
     updateWatchValue,
     watchFieldsHookRenderRef,
     watchFieldsHookRef,
