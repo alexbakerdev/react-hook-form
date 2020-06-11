@@ -465,6 +465,7 @@ export function useForm<
       : [names];
 
     namesInArray.forEach((name: any) => {
+      const nameKey: string = isString(name) ? name : Object.keys(name)[0];
       shouldRender =
         setInternalValue(
           isString(name) ? name : Object.keys(name)[0],
@@ -473,8 +474,8 @@ export function useForm<
             : (Object.values(name)[0] as any),
         ) ||
         isArrayValue ||
-        isFieldWatched(name);
-      renderWatchedInputs(name);
+        isFieldWatched(nameKey);
+      renderWatchedInputs(nameKey);
     });
 
     if (shouldRender || isArrayValue) {
