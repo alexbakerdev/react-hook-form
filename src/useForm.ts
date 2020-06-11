@@ -850,6 +850,8 @@ export function useForm<
         ...field,
         ...validateOptions,
       };
+
+      renderWatchedInputs(name);
       return;
     }
 
@@ -932,6 +934,8 @@ export function useForm<
         handleChange: handleChangeRef.current,
       });
     }
+
+    renderWatchedInputs(name);
   }
 
   function register<TFieldElement extends FieldElement<TFieldValues>>(): (
