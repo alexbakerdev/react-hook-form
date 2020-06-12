@@ -261,15 +261,16 @@ export function useForm<
         unset(dirtyFieldsRef.current, name);
       }
 
-      isDirtyRef.current = isFieldArray
-        ? getIsFieldsDifferent(
+      isDirtyRef.current =
+        (isFieldArray &&
+          getIsFieldsDifferent(
             getFieldArrayValueByName(
               fieldsRef.current,
               getFieldArrayParentName(name),
             ),
             get(defaultValuesRef.current, getFieldArrayParentName(name)),
-          ) || !isEmptyObject(dirtyFieldsRef.current)
-        : !isEmptyObject(dirtyFieldsRef.current);
+          )) ||
+        !isEmptyObject(dirtyFieldsRef.current);
 
       return (
         (isDirty && previousIsDirty !== isDirtyRef.current) ||
@@ -425,10 +426,8 @@ export function useForm<
             name.startsWith(data),
           )
         ) {
-          if (watchFieldsHookRenderRef.current[key]) {
-            watchFieldsHookRenderRef.current[key]();
-            found = false;
-          }
+          watchFieldsHookRenderRef.current[key]();
+          found = false;
         }
       }
     }
@@ -567,25 +566,21 @@ export function useForm<
         ? getFieldsValues(fieldsRef.current)
         : defaultValuesRef.current;
 
-      if (resolverRef.current) {
-        resolverRef
-          .current(
-            transformToNestObject({
-              ...fieldValues,
-              ...values,
-            }),
-            contextRef.current,
-            validateAllFieldCriteria,
-          )
-          .then(({ errors }) => {
-            const previousFormIsValid = isValidRef.current;
-            isValidRef.current = isEmptyObject(errors);
+      resolverRef.current!(
+        transformToNestObject({
+          ...fieldValues,
+          ...values,
+        }),
+        contextRef.current,
+        validateAllFieldCriteria,
+      ).then(({ errors }) => {
+        const previousFormIsValid = isValidRef.current;
+        isValidRef.current = isEmptyObject(errors);
 
-            if (previousFormIsValid !== isValidRef.current) {
-              reRender();
-            }
-          });
-      }
+        if (previousFormIsValid !== isValidRef.current) {
+          reRender();
+        }
+      });
     },
     [reRender, validateAllFieldCriteria, resolverRef],
   );
