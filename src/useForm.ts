@@ -745,10 +745,6 @@ export function useForm<
           fieldValues,
           fieldNames,
           watchFields,
-          isUndefined(defaultValue)
-            ? get(combinedDefaultValues, fieldNames)
-            : (defaultValue as UnpackNestedValue<DeepPartial<TFieldValues>>),
-          true,
         );
       }
 
@@ -760,9 +756,6 @@ export function useForm<
               fieldValues,
               name,
               watchFields,
-              combinedDefaultValues as UnpackNestedValue<
-                DeepPartial<TFieldValues>
-              >,
             ),
           }),
           {},
