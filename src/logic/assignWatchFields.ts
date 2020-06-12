@@ -15,8 +15,6 @@ export default <TFieldValues extends FieldValues>(
   fieldValues: TFieldValues,
   fieldName: InternalFieldName<TFieldValues>,
   watchFields: Set<InternalFieldName<TFieldValues>>,
-  inputValue: UnpackNestedValue<DeepPartial<TFieldValues>>,
-  isSingleField?: boolean,
 ):
   | FieldValue<TFieldValues>
   | UnpackNestedValue<DeepPartial<TFieldValues>>
@@ -39,9 +37,5 @@ export default <TFieldValues extends FieldValues>(
     }
   }
 
-  return isUndefined(value)
-    ? isSingleField
-      ? inputValue
-      : get(inputValue, fieldName)
-    : value;
+  return value;
 };

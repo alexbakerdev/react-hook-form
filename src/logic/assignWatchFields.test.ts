@@ -2,7 +2,7 @@ import assignWatchFields from './assignWatchFields';
 
 describe('assignWatchFields', () => {
   it('should return undefined when field values is empty object or undefined', () => {
-    expect(assignWatchFields<any>({}, '', new Set(''), {})).toEqual(undefined);
+    expect(assignWatchFields<any>({}, '', new Set(''))).toEqual(undefined);
   });
 
   it('should return watched value and update watchFields', () => {
@@ -20,7 +20,6 @@ describe('assignWatchFields', () => {
         { 'test[0]': '', 'test[1]': '' },
         'test',
         watchFields as any,
-        {},
       ),
     ).toEqual(['', '']);
     expect(watchFields).toEqual(new Set(['test', 'test[0]', 'test[1]']));
