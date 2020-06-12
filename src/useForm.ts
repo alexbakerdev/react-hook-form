@@ -77,6 +77,7 @@ export function useForm<
   context,
   defaultValues = {} as UnpackNestedValue<DeepPartial<TFieldValues>>,
   shouldFocusError = true,
+  shouldUnregister = true,
   criteriaMode,
 }: UseFormOptions<TFieldValues, TContext> = {}): UseFormMethods<TFieldValues> {
   const fieldsRef = React.useRef<FieldRefs<TFieldValues>>({});
@@ -112,6 +113,7 @@ export function useForm<
   const submitCountRef = React.useRef(0);
   const isSubmittingRef = React.useRef(false);
   const handleChangeRef = React.useRef<HandleChange>();
+  const unmountFieldsStateRef = React.useRef<Record<string, any>>({});
   const resetFieldArrayFunctionRef = React.useRef({});
   const contextRef = React.useRef(context);
   const resolverRef = React.useRef(resolver);
@@ -591,10 +593,12 @@ export function useForm<
         fieldsRef.current,
         handleChangeRef.current!,
         field,
+        unmountFieldsStateRef,
+        shouldUnregister,
         forceDelete,
       );
     },
-    [],
+    [shouldUnregister],
   );
 
   const removeFieldEventListenerAndRef = React.useCallback(
@@ -871,8 +875,14 @@ export function useForm<
 
     fields[name] = field;
 
-    if (!isEmptyObject(defaultValuesRef.current)) {
-      defaultValue = get(defaultValuesRef.current, name);
+    const isEmptyUnmountFields = isUndefined(
+      unmountFieldsStateRef.current[name],
+    );
+
+    if (!isEmptyObject(defaultValuesRef.current) || !isEmptyUnmountFields) {
+      defaultValue = isEmptyUnmountFields
+        ? get(defaultValuesRef.current, name)
+        : unmountFieldsStateRef.current[name];
       isEmptyDefaultValue = isUndefined(defaultValue);
       isFieldArray = isNameInFieldArray(fieldArrayNamesRef.current, name);
 
@@ -973,7 +983,10 @@ export function useForm<
         e.persist();
       }
       let fieldErrors: FieldErrors<TFieldValues> = {};
-      let fieldValues: FieldValues = getFieldsValues(fieldsRef.current);
+      let fieldValues: FieldValues = {
+        ...unmountFieldsStateRef.current,
+        ...getFieldsValues(fieldsRef.current),
+      };
 
       if (readFormStateRef.current.isSubmitting) {
         isSubmittingRef.current = true;
@@ -1077,6 +1090,7 @@ export function useForm<
       TFieldValues
     >;
     fieldArrayDefaultValues.current = {};
+    unmountFieldsStateRef.current = {};
     watchFieldsRef.current = new Set();
     isWatchAllRef.current = false;
   };
@@ -1248,6 +1262,7 @@ export function useForm<
     isSubmittedRef,
     readFormStateRef,
     defaultValuesRef,
+    unmountFieldsStateRef,
     ...commonProps,
   };
 
