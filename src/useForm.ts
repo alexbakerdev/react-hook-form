@@ -801,12 +801,10 @@ export function useForm<
   function unregister(
     name: FieldName<TFieldValues> | FieldName<TFieldValues>[],
   ): void {
-    if (fieldsRef.current) {
-      (isArray(name) ? name : [name]).forEach((fieldName) => {
-        removeFieldEventListenerAndRef(fieldsRef.current[fieldName], true);
+    (isArray(name) ? name : [name]).forEach((fieldName) => {
+      removeFieldEventListenerAndRef(fieldsRef.current[fieldName], true),
         renderWatchedInputs(fieldName);
-      });
-    }
+    });
   }
 
   function registerFieldsRef<TFieldElement extends FieldElement<TFieldValues>>(
