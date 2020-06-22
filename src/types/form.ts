@@ -89,6 +89,7 @@ export type UseFormOptions<
   resolver: Resolver<TFieldValues, TContext>;
   context: TContext;
   shouldFocusError: boolean;
+  shouldUnregister: boolean;
   criteriaMode: 'firstError' | 'all';
 }>;
 
@@ -97,11 +98,11 @@ export type MutationWatcher = {
   observe?: any;
 };
 
-export type Message = string | React.ReactElement;
+export type Message = string;
 
 export type ValidationValue = boolean | number | string | RegExp;
 
-export type ValidationOption<
+export type ValidationRule<
   TValidationValue extends ValidationValue = ValidationValue
 > = TValidationValue | ValidationValueMessage<TValidationValue>;
 
@@ -116,13 +117,13 @@ export type ValidateResult = Message | boolean | undefined;
 
 export type Validate = (data: any) => ValidateResult | Promise<ValidateResult>;
 
-export type ValidationOptions = Partial<{
-  required: Message | ValidationOption<boolean>;
-  min: ValidationOption<number | string>;
-  max: ValidationOption<number | string>;
-  maxLength: ValidationOption<number | string>;
-  minLength: ValidationOption<number | string>;
-  pattern: ValidationOption<RegExp>;
+export type ValidationRules = Partial<{
+  required: Message | ValidationRule<boolean>;
+  min: ValidationRule<number | string>;
+  max: ValidationRule<number | string>;
+  maxLength: ValidationRule<number | string>;
+  minLength: ValidationRule<number | string>;
+  pattern: ValidationRule<RegExp>;
   validate: Validate | Record<string, Validate>;
 }>;
 
@@ -133,7 +134,6 @@ export type FieldError = {
   ref?: Ref;
   types?: MultipleFieldErrors;
   message?: Message;
-  isManual?: boolean;
 };
 
 export type ManualFieldError<TFieldValues extends FieldValues> = {
@@ -143,11 +143,20 @@ export type ManualFieldError<TFieldValues extends FieldValues> = {
   message?: Message;
 };
 
+export type ErrorOption =
+  | {
+      types: MultipleFieldErrors;
+    }
+  | {
+      message?: Message;
+      type: string;
+    };
+
 export type Field = {
   ref: Ref;
   mutationWatcher?: MutationWatcher;
   options?: RadioOrCheckboxOption[];
-} & ValidationOptions;
+} & ValidationRules;
 
 export type FieldRefs<TFieldValues extends FieldValues> = Partial<
   Record<InternalFieldName<TFieldValues>, Field>
@@ -170,6 +179,11 @@ export type Dirtied<TFieldValues extends FieldValues> = DeepMap<
   TFieldValues,
   true
 >;
+
+export type SetValueConfig = Partial<{
+  shouldValidate: boolean;
+  shouldDirty: boolean;
+}>;
 
 export type FormStateProxy<TFieldValues extends FieldValues = FieldValues> = {
   isDirty: boolean;
@@ -212,7 +226,7 @@ export type FieldValuesFromControl<
 
 export type Control<TFieldValues extends FieldValues = FieldValues> = Pick<
   UseFormMethods<TFieldValues>,
-  'register' | 'unregister' | 'setValue' | 'getValues' | 'trigger' | 'formState'
+  'register' | 'unregister' | 'setValue' | 'trigger' | 'formState'
 > & {
   reRender: () => void;
   removeFieldEventListener: (field: Field, forceDelete?: boolean) => void;
@@ -240,6 +254,7 @@ export type Control<TFieldValues extends FieldValues = FieldValues> = Pick<
   resetFieldArrayFunctionRef: React.MutableRefObject<
     Record<string, (values: any) => void>
   >;
+  unmountFieldsStateRef: Record<string, any>;
   fieldArrayNamesRef: React.MutableRefObject<Set<string>>;
   isDirtyRef: React.MutableRefObject<boolean>;
   isSubmittedRef: React.MutableRefObject<boolean>;
@@ -263,7 +278,7 @@ export type Control<TFieldValues extends FieldValues = FieldValues> = Pick<
   watchInternal: (
     fieldNames?: string | string[],
     defaultValue?: unknown,
-    isUseWatch?: string,
+    watchId?: string,
   ) => unknown;
   renderWatchedInputs: (name: string, found?: boolean) => void;
 };
@@ -298,24 +313,17 @@ export type UseWatchOptions = {
   control?: Control;
 };
 
-export type FieldValuesFromFieldErrors<
-  TFieldErrors
-> = TFieldErrors extends FieldErrors<infer TFieldValues> ? TFieldValues : never;
-
 export type UseFormMethods<TFieldValues extends FieldValues = FieldValues> = {
   register<TFieldElement extends FieldElement<TFieldValues>>(): (
     ref: TFieldElement | null,
   ) => void;
   register<TFieldElement extends FieldElement<TFieldValues>>(
-    validationOptions: ValidationOptions,
+    rules: ValidationRules,
   ): (ref: TFieldElement | null) => void;
-  register(
-    name: FieldName<TFieldValues>,
-    validationOptions?: ValidationOptions,
-  ): void;
+  register(name: FieldName<TFieldValues>, rules?: ValidationRules): void;
   register<TFieldElement extends FieldElement<TFieldValues>>(
     ref: TFieldElement | null,
-    validationOptions?: ValidationOptions,
+    rules?: ValidationRules,
   ): void;
   unregister(name: FieldName<TFieldValues> | FieldName<TFieldValues>[]): void;
   watch(): UnpackNestedValue<TFieldValues>;
@@ -336,29 +344,17 @@ export type UseFormMethods<TFieldValues extends FieldValues = FieldValues> = {
     names: string[],
     defaultValues?: UnpackNestedValue<DeepPartial<TFieldValues>>,
   ): UnpackNestedValue<DeepPartial<TFieldValues>>;
-  setError(name: FieldName<TFieldValues>, type: MultipleFieldErrors): void;
-  setError(
-    name: FieldName<TFieldValues>,
-    type: string,
-    message?: Message,
-  ): void;
-  setError(name: ManualFieldError<TFieldValues>[]): void;
-  clearError(name?: FieldName<TFieldValues> | FieldName<TFieldValues>[]): void;
+  setError(name: FieldName<TFieldValues>, error: ErrorOption): void;
+  clearErrors(name?: FieldName<TFieldValues> | FieldName<TFieldValues>[]): void;
   setValue<
     TFieldName extends string,
     TFieldValue extends TFieldValues[TFieldName]
   >(
     name: TFieldName,
-    value: NonUndefined<TFieldValue> extends NestedValue<infer U>
+    value?: NonUndefined<TFieldValue> extends NestedValue<infer U>
       ? U
       : UnpackNestedValue<DeepPartial<LiteralToPrimitive<TFieldValue>>>,
-    shouldValidate?: boolean,
-  ): void;
-  setValue<TFieldName extends keyof TFieldValues>(
-    namesWithValue: UnpackNestedValue<
-      DeepPartial<Pick<TFieldValues, TFieldName>>
-    >[],
-    shouldValidate?: boolean,
+    options?: SetValueConfig,
   ): void;
   trigger(
     name?: FieldName<TFieldValues> | FieldName<TFieldValues>[],

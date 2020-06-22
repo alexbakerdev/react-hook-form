@@ -1,4 +1,4 @@
-context('controller basic form validation', () => {
+describe('controller basic form validation', () => {
   it('should validate the form and reset the form', () => {
     cy.visit('http://localhost:3000/controller/onSubmit');
     cy.get('#submit').click();
@@ -20,7 +20,7 @@ context('controller basic form validation', () => {
     cy.get('#input-ReactSelect > div > div').eq(1).click();
 
     cy.get('.container > p').should('have.length', 0);
-    cy.get('#renderCount').contains('8');
+    cy.get('#renderCount').contains('9');
   });
 
   it('should validate the form with onBlur mode and reset the form', () => {

@@ -1,4 +1,3 @@
-import * as React from 'react';
 import validateField from './validateField';
 import getRadioValue from './getRadioValue';
 import getCheckboxValue from './getCheckboxValue';
@@ -6,9 +5,11 @@ import getCheckboxValue from './getCheckboxValue';
 jest.mock('./getRadioValue');
 jest.mock('./getCheckboxValue');
 
-const setCustomValidity = () => {};
-
 describe('validateField', () => {
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
+
   it('should return required true when input not filled with required', async () => {
     (getRadioValue as any).mockImplementation(() => ({
       value: '2',
@@ -20,12 +21,12 @@ describe('validateField', () => {
 
     expect(
       await validateField({} as any, false, {
-        ref: { type: 'text', value: '', name: 'test', setCustomValidity },
+        ref: { type: 'text', value: '', name: 'test' },
         required: true,
       }),
     ).toEqual({
       test: {
-        ref: { type: 'text', value: '', name: 'test', setCustomValidity },
+        ref: { type: 'text', value: '', name: 'test' },
         message: '',
         type: 'required',
       },
@@ -33,12 +34,12 @@ describe('validateField', () => {
 
     expect(
       await validateField({} as any, false, {
-        ref: { type: 'text', value: '', name: 'test', setCustomValidity },
+        ref: { type: 'text', value: '', name: 'test' },
         required: 'required',
       }),
     ).toEqual({
       test: {
-        ref: { type: 'text', value: '', name: 'test', setCustomValidity },
+        ref: { type: 'text', value: '', name: 'test' },
         message: 'required',
         type: 'required',
       },
@@ -46,20 +47,20 @@ describe('validateField', () => {
 
     expect(
       await validateField({} as any, false, {
-        ref: { type: 'text', value: '', name: 'test', setCustomValidity },
-        required: <p>required</p>,
+        ref: { type: 'text', value: '', name: 'test' },
+        required: 'required',
       }),
     ).toEqual({
       test: {
-        ref: { type: 'text', value: '', name: 'test', setCustomValidity },
-        message: <p>required</p>,
+        ref: { type: 'text', value: '', name: 'test' },
+        message: 'required',
         type: 'required',
       },
     });
 
     expect(
       await validateField({} as any, false, {
-        ref: { type: 'text', value: '', name: 'test', setCustomValidity },
+        ref: { type: 'text', value: '', name: 'test' },
         required: {
           value: true,
           message: 'required',
@@ -67,7 +68,7 @@ describe('validateField', () => {
       }),
     ).toEqual({
       test: {
-        ref: { type: 'text', value: '', name: 'test', setCustomValidity },
+        ref: { type: 'text', value: '', name: 'test' },
         message: 'required',
         type: 'required',
       },
@@ -75,23 +76,23 @@ describe('validateField', () => {
 
     expect(
       await validateField({} as any, false, {
-        ref: { type: 'text', value: '', name: 'test', setCustomValidity },
+        ref: { type: 'text', value: '', name: 'test' },
         required: {
           value: true,
-          message: <p>required</p>,
+          message: 'required',
         },
       }),
     ).toEqual({
       test: {
-        ref: { type: 'text', value: '', name: 'test', setCustomValidity },
-        message: <p>required</p>,
+        ref: { type: 'text', value: '', name: 'test' },
+        message: 'required',
         type: 'required',
       },
     });
 
     expect(
       await validateField({} as any, false, {
-        ref: { type: 'text', value: '', name: 'test', setCustomValidity },
+        ref: { type: 'text', value: '', name: 'test' },
         required: {
           value: false,
           message: 'required',
@@ -115,7 +116,7 @@ describe('validateField', () => {
         },
         false,
         {
-          ref: { type: 'radio', name: 'test', setCustomValidity },
+          ref: { type: 'radio', name: 'test' },
           required: true,
         },
       ),
@@ -129,14 +130,14 @@ describe('validateField', () => {
 
     expect(
       await validateField({} as any, false, {
-        ref: { type: 'text', value: '', name: 'test', setCustomValidity },
+        ref: { type: 'text', value: '', name: 'test' },
         required: 'test',
       }),
     ).toEqual({
       test: {
         message: 'test',
         type: 'required',
-        ref: { type: 'text', name: 'test', value: '', setCustomValidity },
+        ref: { type: 'text', name: 'test', value: '' },
       },
     });
 
@@ -156,7 +157,7 @@ describe('validateField', () => {
         },
         false,
         {
-          ref: { type: 'radio', value: '', name: 'test', setCustomValidity },
+          ref: { type: 'radio', value: '', name: 'test' },
           required: 'test',
         },
       ),
@@ -184,7 +185,7 @@ describe('validateField', () => {
         },
         false,
         {
-          ref: { type: 'checkbox', name: 'test', setCustomValidity },
+          ref: { type: 'checkbox', name: 'test' },
           required: 'test',
         },
       ),
@@ -216,7 +217,7 @@ describe('validateField', () => {
         },
         false,
         {
-          ref: { type: 'checkbox', name: 'test', setCustomValidity },
+          ref: { type: 'checkbox', name: 'test' },
           required: 'test',
         },
       ),
@@ -261,13 +262,13 @@ describe('validateField', () => {
         required: true,
         max: {
           value: 0,
-          message: <p>max</p>,
+          message: 'max',
         },
       }),
     ).toEqual({
       test: {
         type: 'max',
-        message: <p>max</p>,
+        message: 'max',
         ref: { type: 'number', name: 'test', value: 10, valueAsNumber: 10 },
       },
     });
@@ -405,13 +406,13 @@ describe('validateField', () => {
         required: true,
         min: {
           value: 0,
-          message: <p>min</p>,
+          message: 'min',
         },
       }),
     ).toEqual({
       test: {
         type: 'min',
-        message: <p>min</p>,
+        message: 'min',
         ref: { type: 'number', name: 'test', value: -1, valueAsNumber: -1 },
       },
     });
@@ -492,13 +493,13 @@ describe('validateField', () => {
         required: true,
         min: {
           value: '2019-3-12',
-          message: <p>min</p>,
+          message: 'min',
         },
       }),
     ).toEqual({
       test: {
         type: 'min',
-        message: <p>min</p>,
+        message: 'min',
         ref: {
           type: 'date',
           name: 'test',
@@ -570,7 +571,6 @@ describe('validateField', () => {
           type: 'text',
           name: 'test',
           value: 'This is a long text input',
-          setCustomValidity,
         },
         required: true,
         maxLength: 12,
@@ -581,7 +581,6 @@ describe('validateField', () => {
           type: 'text',
           name: 'test',
           value: 'This is a long text input',
-          setCustomValidity,
         },
         message: '',
         type: 'maxLength',
@@ -594,7 +593,6 @@ describe('validateField', () => {
           type: 'text',
           name: 'test',
           value: 'This is a long text input',
-          setCustomValidity,
         },
         required: true,
         maxLength: {
@@ -608,7 +606,6 @@ describe('validateField', () => {
           type: 'text',
           name: 'test',
           value: 'This is a long text input',
-          setCustomValidity,
         },
         message: 'maxLength',
         type: 'maxLength',
@@ -621,12 +618,11 @@ describe('validateField', () => {
           type: 'text',
           name: 'test',
           value: 'This is a long text input',
-          setCustomValidity,
         },
         required: true,
         maxLength: {
           value: 12,
-          message: <p>maxLength</p>,
+          message: 'maxLength',
         },
       }),
     ).toEqual({
@@ -635,9 +631,8 @@ describe('validateField', () => {
           type: 'text',
           name: 'test',
           value: 'This is a long text input',
-          setCustomValidity,
         },
-        message: <p>maxLength</p>,
+        message: 'maxLength',
         type: 'maxLength',
       },
     });
@@ -650,7 +645,6 @@ describe('validateField', () => {
           type: 'text',
           name: 'test',
           value: 'This is a long text input',
-          setCustomValidity,
         },
         required: true,
         minLength: 200,
@@ -661,7 +655,6 @@ describe('validateField', () => {
           type: 'text',
           name: 'test',
           value: 'This is a long text input',
-          setCustomValidity,
         },
         message: '',
         type: 'minLength',
@@ -674,7 +667,6 @@ describe('validateField', () => {
           type: 'text',
           name: 'test',
           value: 'This is a long text input',
-          setCustomValidity,
         },
         required: true,
         minLength: {
@@ -688,7 +680,6 @@ describe('validateField', () => {
           type: 'text',
           name: 'test',
           value: 'This is a long text input',
-          setCustomValidity,
         },
         message: 'minLength',
         type: 'minLength',
@@ -701,12 +692,11 @@ describe('validateField', () => {
           type: 'text',
           name: 'test',
           value: 'This is a long text input',
-          setCustomValidity,
         },
         required: true,
         minLength: {
           value: 200,
-          message: <p>minLength</p>,
+          message: 'minLength',
         },
       }),
     ).toEqual({
@@ -715,9 +705,8 @@ describe('validateField', () => {
           type: 'text',
           name: 'test',
           value: 'This is a long text input',
-          setCustomValidity,
         },
-        message: <p>minLength</p>,
+        message: 'minLength',
         type: 'minLength',
       },
     });
@@ -732,7 +721,6 @@ describe('validateField', () => {
           type: 'text',
           name: 'test',
           value: 'This is a long text input',
-          setCustomValidity,
         },
         required: true,
         pattern: emailRegex,
@@ -743,7 +731,6 @@ describe('validateField', () => {
           type: 'text',
           name: 'test',
           value: 'This is a long text input',
-          setCustomValidity,
         },
         message: '',
         type: 'pattern',
@@ -756,7 +743,6 @@ describe('validateField', () => {
           type: 'text',
           name: 'test',
           value: 'This is a long text input',
-          setCustomValidity,
         },
         required: true,
         pattern: {
@@ -770,7 +756,6 @@ describe('validateField', () => {
           type: 'text',
           name: 'test',
           value: 'This is a long text input',
-          setCustomValidity,
         },
         message: 'regex failed',
         type: 'pattern',
@@ -783,12 +768,11 @@ describe('validateField', () => {
           type: 'text',
           name: 'test',
           value: 'This is a long text input',
-          setCustomValidity,
         },
         required: true,
         pattern: {
           value: emailRegex,
-          message: <p>regex failed</p>,
+          message: 'regex failed',
         },
       }),
     ).toEqual({
@@ -797,9 +781,8 @@ describe('validateField', () => {
           type: 'text',
           name: 'test',
           value: 'This is a long text input',
-          setCustomValidity,
         },
-        message: <p>regex failed</p>,
+        message: 'regex failed',
         type: 'pattern',
       },
     });
@@ -810,7 +793,6 @@ describe('validateField', () => {
           type: 'text',
           name: 'test',
           value: 'test@test.com',
-          setCustomValidity,
         },
         required: true,
         pattern: emailRegex,
@@ -824,7 +806,11 @@ describe('validateField', () => {
         {
           current: {
             test: {
-              ref: {} as any,
+              ref: {
+                type: 'text',
+                name: 'test',
+                value: 'This is a long text input',
+              },
             },
           },
         },
@@ -834,7 +820,6 @@ describe('validateField', () => {
             type: 'text',
             name: 'test',
             value: 'This is a long text input',
-            setCustomValidity,
           },
           required: true,
           validate: (value) => value.toString().length > 3,
@@ -847,7 +832,11 @@ describe('validateField', () => {
         {
           current: {
             test: {
-              ref: {} as any,
+              ref: {
+                type: 'text',
+                name: 'test',
+                value: 'This is a long text input',
+              },
             },
           },
         },
@@ -857,7 +846,6 @@ describe('validateField', () => {
             type: 'text',
             name: 'test',
             value: 'This is a long text input',
-            setCustomValidity,
           },
           required: true,
           validate: (value) => value.toString().length < 3,
@@ -870,7 +858,6 @@ describe('validateField', () => {
           type: 'text',
           name: 'test',
           value: 'This is a long text input',
-          setCustomValidity,
         },
         type: 'validate',
       },
@@ -881,7 +868,11 @@ describe('validateField', () => {
         {
           current: {
             test: {
-              ref: {} as any,
+              ref: {
+                type: 'text',
+                name: 'test',
+                value: 'This is a long text input',
+              },
             },
           },
         },
@@ -891,7 +882,6 @@ describe('validateField', () => {
             type: 'text',
             name: 'test',
             value: 'This is a long text input',
-            setCustomValidity,
           },
           required: true,
           validate: {
@@ -906,7 +896,6 @@ describe('validateField', () => {
           type: 'text',
           name: 'test',
           value: 'This is a long text input',
-          setCustomValidity,
         },
         type: 'test',
         message: '',
@@ -925,7 +914,11 @@ describe('validateField', () => {
         {
           current: {
             test: {
-              ref: '' as any,
+              ref: {
+                type: 'text',
+                name: 'test',
+                value: 'This is a long text input!',
+              },
             },
           },
         },
@@ -935,7 +928,6 @@ describe('validateField', () => {
             type: 'text',
             name: 'test',
             value: 'This is a long text input!',
-            setCustomValidity,
           },
           validate: {
             test: (value) => value.toString().length < 3,
@@ -949,7 +941,6 @@ describe('validateField', () => {
           name: 'test',
           type: 'text',
           value: 'This is a long text input!',
-          setCustomValidity,
         },
         type: 'test',
         message: '',
@@ -961,7 +952,11 @@ describe('validateField', () => {
         {
           current: {
             test: {
-              ref: '' as any,
+              ref: {
+                type: 'radio',
+                name: 'test',
+                value: 'This is a long text input!',
+              },
             },
           },
         },
@@ -971,7 +966,6 @@ describe('validateField', () => {
             type: 'radio',
             name: 'test',
             value: 'This is a long text input!',
-            setCustomValidity,
           },
           validate: {
             test: (value) => value.toString().length < 3,
@@ -999,7 +993,11 @@ describe('validateField', () => {
         {
           current: {
             test: {
-              ref: {} as any,
+              ref: {
+                type: 'text',
+                name: 'test',
+                value: 'This is a long text input',
+              },
             },
           },
         },
@@ -1009,7 +1007,6 @@ describe('validateField', () => {
             type: 'text',
             name: 'test',
             value: 'This is a long text input',
-            setCustomValidity,
           },
           validate: {
             test: (value) => {
@@ -1029,7 +1026,6 @@ describe('validateField', () => {
           type: 'text',
           name: 'test',
           value: 'This is a long text input',
-          setCustomValidity,
         },
       },
     });
@@ -1039,7 +1035,11 @@ describe('validateField', () => {
         {
           current: {
             test: {
-              ref: {} as any,
+              ref: {
+                type: 'text',
+                name: 'test',
+                value: 'This is a long text input',
+              },
             },
           },
         },
@@ -1049,12 +1049,11 @@ describe('validateField', () => {
             type: 'text',
             name: 'test',
             value: 'This is a long text input',
-            setCustomValidity,
           },
           validate: {
             test: (value) => {
               if (value.toString().length > 3) {
-                return <p>max 3</p>;
+                return 'max 3';
               }
               return true;
             },
@@ -1064,12 +1063,11 @@ describe('validateField', () => {
     ).toEqual({
       test: {
         type: 'test',
-        message: <p>max 3</p>,
+        message: 'max 3',
         ref: {
           type: 'text',
           name: 'test',
           value: 'This is a long text input',
-          setCustomValidity,
         },
       },
     });
@@ -1081,7 +1079,11 @@ describe('validateField', () => {
         {
           current: {
             test: {
-              ref: {} as any,
+              ref: {
+                type: 'text',
+                name: 'test',
+                value: 'This is a long text input',
+              },
             },
           },
         },
@@ -1091,7 +1093,6 @@ describe('validateField', () => {
             type: 'text',
             name: 'test',
             value: 'This is a long text input',
-            setCustomValidity,
           },
           validate: (value) => value.toString().length < 3 || 'bill',
         },
@@ -1104,7 +1105,6 @@ describe('validateField', () => {
           type: 'text',
           name: 'test',
           value: 'This is a long text input',
-          setCustomValidity,
         },
       },
     });
@@ -1114,7 +1114,11 @@ describe('validateField', () => {
         {
           current: {
             test: {
-              ref: {} as any,
+              ref: {
+                type: 'text',
+                name: 'test',
+                value: 'This is a long text input',
+              },
             },
           },
         },
@@ -1124,20 +1128,18 @@ describe('validateField', () => {
             type: 'text',
             name: 'test',
             value: 'This is a long text input',
-            setCustomValidity,
           },
-          validate: (value) => value.toString().length < 3 || <p>bill</p>,
+          validate: (value) => value.toString().length < 3 || 'bill',
         },
       ),
     ).toEqual({
       test: {
         type: 'validate',
-        message: <p>bill</p>,
+        message: 'bill',
         ref: {
           type: 'text',
           name: 'test',
           value: 'This is a long text input',
-          setCustomValidity,
         },
       },
     });
@@ -1171,18 +1173,26 @@ describe('validateField', () => {
       value: '',
     }));
     expect(
-      await validateField({ current: {} }, true, {
-        ref: { type: 'text', value: '', name: 'test', setCustomValidity },
-        required: true,
-        minLength: 10,
-        pattern: /d/i,
-        validate: (value) => value === 'test',
-      }),
+      await validateField(
+        {
+          current: {
+            test: { ref: { type: 'text', value: '', name: 'test' } },
+          },
+        },
+        true,
+        {
+          ref: { type: 'text', value: '', name: 'test' },
+          required: true,
+          minLength: 10,
+          pattern: /d/i,
+          validate: (value) => value === 'test',
+        },
+      ),
     ).toMatchSnapshot();
 
     expect(
       await validateField({ current: {} }, true, {
-        ref: { type: 'text', value: '123', name: 'test', setCustomValidity },
+        ref: { type: 'text', value: '123', name: 'test' },
         required: true,
         minLength: 10,
         pattern: /d/i,
@@ -1196,8 +1206,38 @@ describe('validateField', () => {
       value: '',
     }));
     expect(
+      await validateField(
+        {
+          current: {
+            test: {
+              ref: { type: 'text', value: '', name: 'test' },
+            },
+          },
+        },
+        true,
+        {
+          ref: { type: 'text', value: '', name: 'test' },
+          required: 'test',
+          minLength: {
+            value: 10,
+            message: 'minLength',
+          },
+          pattern: {
+            value: /d/i,
+            message: 'pattern',
+          },
+          validate: {
+            test: (value) => value === 'test',
+            test1: (value) => value == 'test' || 'Luo',
+            test2: (value) => value == 'test' || 'Bill',
+          },
+        },
+      ),
+    ).toMatchSnapshot();
+
+    expect(
       await validateField({ current: {} }, true, {
-        ref: { type: 'text', value: '', name: 'test', setCustomValidity },
+        ref: { type: 'text', value: 'bil', name: 'test' },
         required: 'test',
         minLength: {
           value: 10,
@@ -1217,7 +1257,7 @@ describe('validateField', () => {
 
     expect(
       await validateField({ current: {} }, true, {
-        ref: { type: 'text', value: 'bil', name: 'test', setCustomValidity },
+        ref: { type: 'text', value: 'bil', name: 'test' },
         required: 'test',
         minLength: {
           value: 10,
@@ -1231,26 +1271,6 @@ describe('validateField', () => {
           test: (value) => value === 'test',
           test1: (value) => value == 'test' || 'Luo',
           test2: (value) => value == 'test' || 'Bill',
-        },
-      }),
-    ).toMatchSnapshot();
-
-    expect(
-      await validateField({ current: {} }, true, {
-        ref: { type: 'text', value: 'bil', name: 'test', setCustomValidity },
-        required: <p>test</p>,
-        minLength: {
-          value: 10,
-          message: <p>minLength</p>,
-        },
-        pattern: {
-          value: /d/i,
-          message: <p>pattern</p>,
-        },
-        validate: {
-          test: (value) => value === <p>test</p>,
-          test1: (value) => value == 'test' || <p>Luo</p>,
-          test2: (value) => value == 'test' || <p>Bill</p>,
         },
       }),
     ).toMatchSnapshot();

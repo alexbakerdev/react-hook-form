@@ -15,7 +15,9 @@ const Controller = <
   TAs extends
     | React.ReactElement
     | React.ComponentType<any>
-    | keyof JSX.IntrinsicElements,
+    | 'input'
+    | 'select'
+    | 'textarea',
   TControl extends Control = Control
 >({
   name,
@@ -43,16 +45,19 @@ const Controller = <
     reRender,
     fieldsRef,
     fieldArrayNamesRef,
+    unmountFieldsStateRef,
   } = control || methods.control;
-  const [value, setInputStateValue] = React.useState(
-    isUndefined(defaultValue)
+  const isNotFieldArray = !isNameInFieldArray(fieldArrayNamesRef.current, name);
+  const getInitialValue = () =>
+    !isUndefined(unmountFieldsStateRef.current[name]) && isNotFieldArray
+      ? unmountFieldsStateRef.current[name]
+      : isUndefined(defaultValue)
       ? get(defaultValuesRef.current, name)
-      : defaultValue,
-  );
+      : defaultValue;
+  const [value, setInputStateValue] = React.useState(getInitialValue());
   const valueRef = React.useRef(value);
   const isCheckboxInput = isBoolean(value);
   const onFocusRef = React.useRef(onFocus);
-  const isNotFieldArray = !isNameInFieldArray(fieldArrayNamesRef.current, name);
   const isSubmitted = isSubmittedRef.current;
 
   const shouldValidate = () =>
@@ -111,11 +116,7 @@ const Controller = <
     if (!fieldsRef.current[name]) {
       registerField();
       if (isNotFieldArray) {
-        setInputStateValue(
-          isUndefined(defaultValue)
-            ? get(defaultValuesRef.current, name)
-            : defaultValue,
-        );
+        setInputStateValue(getInitialValue());
       }
     }
   });
@@ -135,7 +136,10 @@ const Controller = <
   };
 
   const onChange = (...event: any[]) =>
-    setValue(name, commonTask(event), shouldValidate());
+    setValue(name, commonTask(event), {
+      shouldValidate: shouldValidate(),
+      shouldDirty: true,
+    });
 
   const props = {
     ...rest,

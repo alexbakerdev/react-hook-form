@@ -2,12 +2,8 @@ import {
   UseFormMethods,
   FieldValues,
   FieldValuesFromControl,
-  FieldValuesFromFieldErrors,
   FieldName,
-  FieldErrors,
-  MultipleFieldErrors,
-  Message,
-  ValidationOptions,
+  ValidationRules,
   Control,
 } from './form';
 import { Assign } from './utils';
@@ -33,13 +29,15 @@ export type ControllerProps<
   TAs extends
     | React.ReactElement
     | React.ComponentType<any>
-    | keyof JSX.IntrinsicElements,
+    | 'input'
+    | 'select'
+    | 'textarea',
   TControl extends Control = Control
 > = Assign<
   {
     name: FieldName<FieldValuesFromControl<TControl>>;
     as?: TAs;
-    rules?: ValidationOptions;
+    rules?: ValidationRules;
     onFocus?: () => void;
     defaultValue?: unknown;
     control?: TControl;
@@ -48,27 +46,6 @@ export type ControllerProps<
       onBlur: () => void;
       value: any;
     }) => React.ReactElement;
-  },
-  AsProps<TAs>
->;
-
-export type ErrorMessageProps<
-  TFieldErrors extends FieldErrors,
-  TAs extends
-    | undefined
-    | React.ReactElement
-    | React.ComponentType<any>
-    | keyof JSX.IntrinsicElements = undefined
-> = Assign<
-  {
-    as?: TAs;
-    errors?: TFieldErrors;
-    name: FieldName<FieldValuesFromFieldErrors<TFieldErrors>>;
-    message?: Message;
-    render?: (data: {
-      message: Message;
-      messages?: MultipleFieldErrors;
-    }) => React.ReactNode;
   },
   AsProps<TAs>
 >;
