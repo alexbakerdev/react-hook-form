@@ -22,7 +22,7 @@ describe('assignWatchFields', () => {
         watchFields as any,
       ),
     ).toEqual(['', '']);
-    expect(watchFields).toEqual(new Set(['test', 'test[0]', 'test[1]']));
+    expect(watchFields).toEqual(new Set(['test']));
   });
 
   it('should return undefined when there is no value match', () => {

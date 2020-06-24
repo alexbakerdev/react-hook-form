@@ -1,7 +1,7 @@
 {
   "name": "@xanderite/react-hook-form",
   "description": "Performant, flexible and extensible forms library for React Hooks",
-  "version": "6.0.0-rc.5",
+  "version": "6.0.0-rc.6",
   "main": "dist/@xanderite/react-hook-form.js",
   "module": "dist/@xanderite/react-hook-form.es.js",
   "types": "dist/@xanderite/index.d.ts",
