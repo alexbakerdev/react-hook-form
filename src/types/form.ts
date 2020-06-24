@@ -134,7 +134,6 @@ export type FieldError = {
   ref?: Ref;
   types?: MultipleFieldErrors;
   message?: Message;
-  isManual?: boolean;
 };
 
 export type ManualFieldError<TFieldValues extends FieldValues> = {
@@ -143,6 +142,15 @@ export type ManualFieldError<TFieldValues extends FieldValues> = {
   types?: MultipleFieldErrors;
   message?: Message;
 };
+
+export type ErrorOption =
+  | {
+      types: MultipleFieldErrors;
+    }
+  | {
+      message?: Message;
+      type: string;
+    };
 
 export type Field = {
   ref: Ref;
@@ -171,6 +179,11 @@ export type Dirtied<TFieldValues extends FieldValues> = DeepMap<
   TFieldValues,
   true
 >;
+
+export type SetValueConfig = Partial<{
+  shouldValidate: boolean;
+  shouldDirty: boolean;
+}>;
 
 export type FormStateProxy<TFieldValues extends FieldValues = FieldValues> = {
   isDirty: boolean;
@@ -213,7 +226,7 @@ export type FieldValuesFromControl<
 
 export type Control<TFieldValues extends FieldValues = FieldValues> = Pick<
   UseFormMethods<TFieldValues>,
-  'register' | 'unregister' | 'setValue' | 'getValues' | 'trigger' | 'formState'
+  'register' | 'unregister' | 'setValue' | 'trigger' | 'formState'
 > & {
   reRender: () => void;
   removeFieldEventListener: (field: Field, forceDelete?: boolean) => void;
@@ -331,29 +344,17 @@ export type UseFormMethods<TFieldValues extends FieldValues = FieldValues> = {
     names: string[],
     defaultValues?: UnpackNestedValue<DeepPartial<TFieldValues>>,
   ): UnpackNestedValue<DeepPartial<TFieldValues>>;
-  setError(name: FieldName<TFieldValues>, type: MultipleFieldErrors): void;
-  setError(
-    name: FieldName<TFieldValues>,
-    type: string,
-    message?: Message,
-  ): void;
-  setError(name: ManualFieldError<TFieldValues>[]): void;
-  clearError(name?: FieldName<TFieldValues> | FieldName<TFieldValues>[]): void;
+  setError(name: FieldName<TFieldValues>, error: ErrorOption): void;
+  clearErrors(name?: FieldName<TFieldValues> | FieldName<TFieldValues>[]): void;
   setValue<
     TFieldName extends string,
     TFieldValue extends TFieldValues[TFieldName]
   >(
     name: TFieldName,
-    value: NonUndefined<TFieldValue> extends NestedValue<infer U>
+    value?: NonUndefined<TFieldValue> extends NestedValue<infer U>
       ? U
       : UnpackNestedValue<DeepPartial<LiteralToPrimitive<TFieldValue>>>,
-    shouldValidate?: boolean,
-  ): void;
-  setValue<TFieldName extends keyof TFieldValues>(
-    namesWithValue: UnpackNestedValue<
-      DeepPartial<Pick<TFieldValues, TFieldName>>
-    >[],
-    shouldValidate?: boolean,
+    options?: SetValueConfig,
   ): void;
   trigger(
     name?: FieldName<TFieldValues> | FieldName<TFieldValues>[],

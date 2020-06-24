@@ -46,6 +46,7 @@ const Controller = <
     fieldsRef,
     fieldArrayNamesRef,
     unmountFieldsStateRef,
+    formState,
   } = control || methods.control;
   const isNotFieldArray = !isNameInFieldArray(fieldArrayNamesRef.current, name);
   const getInitialValue = () =>
@@ -130,13 +131,16 @@ const Controller = <
       reRender();
     }
 
-    if (isOnBlur || isReValidateOnBlur) {
+    if (isOnBlur || (formState.isSubmitted && isReValidateOnBlur)) {
       trigger(name);
     }
   };
 
   const onChange = (...event: any[]) =>
-    setValue(name, commonTask(event), shouldValidate());
+    setValue(name, commonTask(event), {
+      shouldValidate: shouldValidate(),
+      shouldDirty: true,
+    });
 
   const props = {
     ...rest,
