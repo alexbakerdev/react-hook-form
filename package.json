@@ -1,10 +1,10 @@
 {
-  "name": "@xanderite/react-hook-form",
+  "name": "react-hook-form",
   "description": "Performant, flexible and extensible forms library for React Hooks",
-  "version": "6.0.0-rc.6",
-  "main": "dist/@xanderite/react-hook-form.js",
-  "module": "dist/@xanderite/react-hook-form.es.js",
-  "types": "dist/@xanderite/index.d.ts",
+  "version": "6.0.0-rc.5",
+  "main": "dist/react-hook-form.js",
+  "module": "dist/react-hook-form.es.js",
+  "types": "dist/index.d.ts",
   "sideEffects": true,
   "scripts": {
     "clean": "rm -rf dist",
@@ -38,11 +38,11 @@
     "typescript",
     "react-hooks"
   ],
-  "repository": "https://github.com/alexbakerdev/react-hook-form.git",
+  "repository": "https://github.com/react-hook-form/react-hook-form.git",
   "homepage": "https://www.react-hook-form.com",
-  "author": "<alexbakerdev@gmail.com>",
+  "author": "<bluebill1049@hotmail.com>",
   "license": "MIT",
-  "unpkg": "dist/@xanderite/react-hook-form.umd.js",
+  "unpkg": "dist/react-hook-form.umd.js",
   "devDependencies": {
     "@babel/core": "^7.10.2",
     "@babel/plugin-transform-runtime": "^7.10.1",
@@ -82,7 +82,7 @@
   },
   "bundlesize": [
     {
-      "path": "./dist/@xanderite/react-hook-form.min.es.js",
+      "path": "./dist/react-hook-form.min.es.js",
       "maxSize": "9.5 kB"
     }
   ],
