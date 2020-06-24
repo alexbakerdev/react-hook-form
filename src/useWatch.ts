@@ -37,6 +37,9 @@ export function useWatch<TWatchFieldValues>({
   const methods = useFormContext();
   const { watchFieldsHookRef, watchFieldsHookRenderRef, watchInternal } =
     control || methods.control;
+  const idRef = React.useRef<string>('');
+  const defaultValueRef = React.useRef(defaultValue);
+  const initialValueRef = React.useRef<unknown>();
 
   const [value, setValue] = React.useState<unknown>(
     isUndefined(defaultValue)
@@ -52,38 +55,57 @@ export function useWatch<TWatchFieldValues>({
     Array.isArray(name) ? [...name] : [name],
   );
 
-  const idRef = React.useRef<string>();
-  const defaultValueRef = React.useRef(defaultValue);
+  React.useEffect(
+    () => {
+      const id = (idRef.current = generateId());
+      const watchFieldsHook = watchFieldsHookRef.current;
+      watchFieldsHook[id] = new Set();
+      initialValueRef.current = undefined;
+
+      return () => {
+        delete watchFieldsHook[id];
+      };
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [nameCache],
+  );
 
   const updateWatchValue = React.useCallback(
     () =>
       setValue(
         watchInternal(nameCache, defaultValueRef.current, idRef.current),
       ),
-    [setValue, watchInternal, defaultValueRef, nameCache, idRef],
+    [nameCache, watchInternal],
   );
 
   React.useEffect(() => {
-    const id = (idRef.current = generateId());
+    const id = idRef.current;
     const watchFieldsHookRender = watchFieldsHookRenderRef.current;
-    const watchFieldsHook = watchFieldsHookRef.current;
-    watchFieldsHook[id] = new Set();
     watchFieldsHookRender[id] = updateWatchValue;
-    const initialValue = watchInternal(nameCache, defaultValueRef.current, id);
-    setValue(initialValue);
+
+    initialValueRef.current = watchInternal(
+      nameCache,
+      defaultValueRef.current,
+      idRef.current,
+    );
+
     return () => {
-      delete watchFieldsHook[id];
       delete watchFieldsHookRender[id];
     };
   }, [
-    setValue,
     nameCache,
+    idRef,
+    defaultValueRef,
     updateWatchValue,
     watchFieldsHookRenderRef,
-    watchFieldsHookRef,
     watchInternal,
-    defaultValueRef,
   ]);
 
-  return (isUndefined(value) ? defaultValue : value) as TWatchFieldValues;
+  return (isUndefined(initialValueRef.current)
+    ? isUndefined(value)
+      ? defaultValueRef.current
+      : value
+    : isUndefined(value)
+    ? initialValueRef.current
+    : value) as TWatchFieldValues;
 }
