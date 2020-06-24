@@ -55,20 +55,16 @@ export function useWatch<TWatchFieldValues>({
     Array.isArray(name) ? [...name] : [name],
   );
 
-  React.useEffect(
-    () => {
-      const id = (idRef.current = generateId());
-      const watchFieldsHook = watchFieldsHookRef.current;
-      watchFieldsHook[id] = new Set();
-      initialValueRef.current = undefined;
+  React.useEffect(() => {
+    const id = (idRef.current = generateId());
+    const watchFieldsHook = watchFieldsHookRef.current;
+    watchFieldsHook[id] = new Set();
+    initialValueRef.current = undefined;
 
-      return () => {
-        delete watchFieldsHook[id];
-      };
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [nameCache],
-  );
+    return () => {
+      delete watchFieldsHook[id];
+    };
+  }, [nameCache, watchFieldsHookRef]);
 
   const updateWatchValue = React.useCallback(
     () =>
