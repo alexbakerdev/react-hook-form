@@ -1100,18 +1100,6 @@ describe('useForm', () => {
       });
     });
 
-    it('should not work if field is not registered', () => {
-      const { result } = renderHook(() => useForm());
-
-      act(() => {
-        result.current.setValue('test', '1');
-
-        expect(
-          result.current.control.fieldsRef.current['test'],
-        ).toBeUndefined();
-      });
-    });
-
     describe('setDirty', () => {
       it('should set name to dirtyFieldRef if field value is different with default value with ReactNative', () => {
         const { result } = renderHook(() =>
@@ -1167,26 +1155,6 @@ describe('useForm', () => {
 
         act(() => {
           result.current.setValue('test', '1', { shouldDirty: true });
-        });
-
-        expect(transformToNestObject).not.toHaveBeenCalled();
-        expect(result.current.formState.dirtyFields.test).toBeTruthy();
-      });
-
-      it('should set name to dirtyFieldRef if field value is different with default value and isDirty is true', () => {
-        const { result } = renderHook(() =>
-          useForm<{ test: string }>({
-            defaultValues: { test: 'default' },
-          }),
-        );
-        result.current.control.readFormStateRef.current.isDirty = true;
-
-        act(() => {
-          result.current.register('test');
-        });
-
-        act(() => {
-          result.current.setValue('test', '1');
         });
 
         expect(transformToNestObject).not.toHaveBeenCalled();
