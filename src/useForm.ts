@@ -612,6 +612,10 @@ export function useForm<
           }
         }
       }
+
+      if (field?.ref.name) {
+        renderWatchedInputs(field?.ref.name);
+      }
     },
     [reRender, validateResolver, removeFieldEventListener, resolverRef],
   );
